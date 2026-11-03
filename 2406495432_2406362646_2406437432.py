@@ -1,17 +1,18 @@
 # Tugas Pemrograman 1: Geometri Komputasional (CSCE604045)
 # Topik: Algoritma Divide & Conquer untuk Convex Hull
-# Bahasa: Python 3
-# Library yang digunakan: random, tkinter
+# Bahasa: Python 
+# Sumber Rujukan & Bantuan: https://www.geeksforgeeks.org/dsa/convex-hull-using-divide-and-conquer-algorithm/, Gemini, & Claude
 
 import random
 import tkinter as tk
 from tkinter import ttk
 
 
+# Hasil kali silang vektor p1->p2 dan p1->p3 (orientasi tiga titik)
 def cross_product(p1, p2, p3):
     return (p2[0] - p1[0]) * (p3[1] - p1[1]) - (p2[1] - p1[1]) * (p3[0] - p1[0])
 
-
+# Menghitung luas poligon Convex Hull menggunakan Shoelace formula
 def calculate_polygon_area(polygon):
     n = len(polygon)
     area = 0.0
@@ -22,10 +23,11 @@ def calculate_polygon_area(polygon):
 
     return abs(area) / 2.0
 
-
+# Base case untuk recursion Divide & Conquer (n <= 3)
 def base_case_hull(points):
     n = len(points)
 
+    # Kasus n <= 2
     if n <= 2:
         return list(points)
 
@@ -40,7 +42,7 @@ def base_case_hull(points):
         sorted_p = sorted(points)
         return [sorted_p[0], sorted_p[-1]]
 
-
+# Gabungkan 2 convex hull
 def merge_hulls(left_hull, right_hull):
     n1 = len(left_hull)
     n2 = len(right_hull)
@@ -49,18 +51,20 @@ def merge_hulls(left_hull, right_hull):
     # Jika semua titik segaris, hasilnya cukup dua titik terluar.
     if n1 <= 2 and n2 <= 2:
         pts = sorted(left_hull + right_hull)
-        lo, hi = pts[0], pts[-1]
+        lo = pts[0]
+        hi = pts[-1]
         if all(cross_product(lo, hi, p) == 0 for p in pts):
             return [lo, hi]
 
-    # 1. Cari titik paling kanan di hull kiri
+    # Cari titik paling kanan di hull kiri
     left_start_idx = max(range(n1), key=lambda i: (left_hull[i][0], left_hull[i][1]))
-    # 2. Cari titik paling kiri di hull kanan
+    # Cari titik paling kiri di hull kanan
     right_start_idx = min(range(n2), key=lambda i: (right_hull[i][0], right_hull[i][1]))
 
     # Mencari Upper Tangent 
     # Garis singgung atas: tidak boleh ada titik di atas garis A[curr_left_idx] -> B[curr_right_idx]
-    curr_left_idx, curr_right_idx = left_start_idx, right_start_idx
+    curr_left_idx = left_start_idx
+    curr_right_idx = right_start_idx
     while True:
         changed = False
 
@@ -85,11 +89,13 @@ def merge_hulls(left_hull, right_hull):
         if not changed:
             break
 
-    upper_a_idx, upper_b_idx = curr_left_idx, curr_right_idx
+    upper_a_idx = curr_left_idx
+    upper_b_idx =  curr_right_idx
 
     # Mencari Lower Tangent
     # Garis singgung bawah: tidak boleh ada titik di bawah garis A[curr_left_idx] -> B[curr_right_idx]
-    curr_left_idx, curr_right_idx = left_start_idx, right_start_idx
+    curr_left_idx = left_start_idx
+    curr_right_idx = right_start_idx
     while True:
         changed = False
 
@@ -114,7 +120,8 @@ def merge_hulls(left_hull, right_hull):
         if not changed:
             break
 
-    lower_a_idx, lower_b_idx = curr_left_idx, curr_right_idx
+    lower_a_idx = curr_left_idx 
+    lower_b_idx = curr_right_idx
 
     # Menggabungkan titik-titik hasil tangent (urutan CCW)
     merged = []
@@ -142,7 +149,7 @@ def merge_hulls(left_hull, right_hull):
         if cross_product(merged[k - 1], merged[k], merged[(k + 1) % m]) != 0
     ]
 
-
+# Recursion utama Divide & Conquer untuk Convex Hull
 def divide_and_conquer_hull(points):
     if len(points) <= 3:
         return base_case_hull(points)
@@ -159,15 +166,15 @@ def divide_and_conquer_hull(points):
     # Tahap Combine: Gabungkan kedua sub-hull
     return merge_hulls(left_hull, right_hull)
 
-
+# Helper untuk memproses titik unik dan menjalankan algoritma
 def compute_convex_hull(points):
-    # Hapus duplikasi titik dan urutkan berdasarkan x (kemudian y jika x identik)
     unique_pts = sorted(set(points))
     return divide_and_conquer_hull(unique_pts)
 
 
 # GUI MENGGUNAKAN TKINTER
 class ConvexHullGUI:
+    # Inisialisasi jendela utama aplikasi GUI Tkinter
     def __init__(self, root):
         self.root = root
         self.root.title('Tugas 1 Geometri Komputasional: Convex Hull Divide & Conquer')
@@ -183,6 +190,7 @@ class ConvexHullGUI:
         self.setup_ui()
         self.draw_canvas_axes()
 
+    # Membangun UI
     def setup_ui(self):
         # Panel Kontrol (Kiri)
         control_frame = ttk.LabelFrame(self.root, text='Panel Kontrol', padding=(10, 10))
@@ -283,6 +291,7 @@ class ConvexHullGUI:
         self.canvas.pack(fill=tk.BOTH, expand=True)
         self.canvas.bind('<Button-1>', self.on_canvas_click)
 
+    # Konversi koordinat kanvas ke koordinat logis pengguna
     def canvas_to_user_coord(self, px, py):
         if self.origin_mode.get() == 'center':
             ox = self.canvas_width / 2.0
@@ -291,6 +300,7 @@ class ConvexHullGUI:
         else:
             return (px, py)  # Sudut kiri atas sebagai (0, 0)
 
+    # Konversi koordinat logis pengguna ke koordinat piksel kanvas
     def user_to_canvas_coord(self, x, y):
         if self.origin_mode.get() == 'center':
             ox = self.canvas_width / 2.0
@@ -299,6 +309,7 @@ class ConvexHullGUI:
         else:
             return (x, y)
 
+    # Menggambar garis sumbu koordinat pada kanvas
     def draw_canvas_axes(self):
         self.canvas.delete('grid_lines')
         if self.origin_mode.get() == 'center':
@@ -332,21 +343,25 @@ class ConvexHullGUI:
                 tags='grid_lines',
             )
 
+    # Handler ketika mode pusat koordinat diubah
     def on_mode_change(self):
         self.draw_canvas_axes()
         if self.canvas.find_withtag('hull_poly'):
             self.run_convex_hull()
 
+    # Handler ketika pengguna melakukan klik kiri pada kanvas untuk menambah titik
     def on_canvas_click(self, event):
         px, py = event.x, event.y
         self.canvas_points.append((px, py))
         self.draw_point(px, py)
         self.lbl_points_count.config(text=f'Jumlah Titik: {len(self.canvas_points)}')
 
+    # Menggambar titik tunggal pada kanvas
     def draw_point(self, px, py, color='#1f77b4'):
         r = 4
         self.canvas.create_oval(px - r, py - r, px + r, py + r, fill=color, outline='#000000', tags='point')
 
+    # Menghasilkan 25-35 titik acak untuk pengujian program
     def generate_random_sites(self):
         self.clear_canvas()
         num_points = random.randint(25, 35)
@@ -360,6 +375,7 @@ class ConvexHullGUI:
 
         self.lbl_points_count.config(text=f'Jumlah Titik: {len(self.canvas_points)}')
 
+    # Menjalankan perhitungan Convex Hull dan memperbarui visualisasi kanvas
     def run_convex_hull(self):
         if len(self.canvas_points) < 3:
             self.lbl_hull_vertices.config(text='Titik Hull: < 3')
@@ -415,6 +431,7 @@ class ConvexHullGUI:
         self.lbl_hull_vertices.config(text=f'Titik Hull: {len(hull_logical)}')
         self.lbl_area.config(text=f'Luas Hull: {area:,.2f} unit²')
 
+    # Membersihkan seluruh elemen pada kanvas dan mereset status
     def clear_canvas(self):
         self.canvas_points.clear()
         self.canvas.delete('point')
