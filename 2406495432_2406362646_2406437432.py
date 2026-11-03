@@ -1,9 +1,7 @@
-"""
-Tugas Pemrograman 1: Geometri Komputasional (CSCE604045)
-Topik: Algoritma Divide & Conquer untuk Convex Hull
-Bahasa: Python 3
-Library yang digunakan: random, tkinter
-"""
+# Tugas Pemrograman 1: Geometri Komputasional (CSCE604045)
+# Topik: Algoritma Divide & Conquer untuk Convex Hull
+# Bahasa: Python 3
+# Library yang digunakan: random, tkinter
 
 import random
 import tkinter as tk
@@ -16,9 +14,6 @@ def cross_product(p1, p2, p3):
 
 def calculate_polygon_area(polygon):
     n = len(polygon)
-    if n < 3:
-        return 0.0
-
     area = 0.0
     for i in range(n):
         x1, y1 = polygon[i]
@@ -30,10 +25,9 @@ def calculate_polygon_area(polygon):
 
 def base_case_hull(points):
     n = len(points)
-    if n <= 1:
-        return points
-    if n == 2:
-        return [points[0], points[1]] if points[0] != points[1] else [points[0]]
+
+    if n <= 2:
+        return list(points)
 
     # Kasus n == 3
     cross_val = cross_product(points[0], points[1], points[2])
@@ -114,7 +108,7 @@ def merge_hulls(left_hull, right_hull):
 
     lower_a_idx, lower_b_idx = curr_left_idx, curr_right_idx
 
-    # Menggabungkan Titik-Titik Hasil Tangent (Urutan CCW)
+    # Menggabungkan titik-titik hasil tangent (urutan CCW)
     merged = []
 
     # Telusuri hull kiri dari upper_a_idx ke lower_a_idx (arah CCW)
@@ -153,15 +147,12 @@ def divide_and_conquer_hull(points):
 
 def compute_convex_hull(points):
     # Hapus duplikasi titik dan urutkan berdasarkan x (kemudian y jika x identik)
-    unique_pts = sorted(list(set(points)), key=lambda p: (p[0], p[1]))
-    if len(unique_pts) <= 2:
-        return unique_pts
+    unique_pts = sorted(set(points))
     return divide_and_conquer_hull(unique_pts)
 
 
 # GUI MENGGUNAKAN TKINTER
 class ConvexHullGUI:
-
     def __init__(self, root):
         self.root = root
         self.root.title('Tugas 1 Geometri Komputasional: Convex Hull Divide & Conquer')
@@ -328,7 +319,7 @@ class ConvexHullGUI:
 
     def on_mode_change(self):
         self.draw_canvas_axes()
-        if self.canvas.find_withtag('hull_poly') and self.canvas_points:
+        if self.canvas.find_withtag('hull_poly'):
             self.run_convex_hull()
 
     def on_canvas_click(self, event):
