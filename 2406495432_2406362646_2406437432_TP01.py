@@ -3,6 +3,7 @@
 # Bahasa: Python 
 # Sumber Rujukan & Bantuan: https://www.geeksforgeeks.org/dsa/convex-hull-using-divide-and-conquer-algorithm/, Gemini, & Claude
 
+# Anggota:
 # Ahmad Wasis Shofiyulloh (NPM: 2406362646)
 # Angelo Benhanan Abinaya Fuun (NPM: 2406495432)
 # Muhammad Hadziqul Falah Teguh (NPM : 2406437432)
