@@ -11,22 +11,10 @@ from tkinter import ttk
 
 
 def cross_product(p1, p2, p3):
-    """
-    Menghitung perkalian silang (cross product) dari vektor (p1 -> p2) dan (p1 -> p3).
-
-    Nilai > 0: Belok kiri / Counter-Clockwise (CCW).
-    Nilai < 0: Belok kanan / Clockwise (CW).
-    Nilai == 0: Titik kolinear (segaris).
-    """
     return (p2[0] - p1[0]) * (p3[1] - p1[1]) - (p2[1] - p1[1]) * (p3[0] - p1[0])
 
 
 def calculate_polygon_area(polygon):
-    """
-    Menghitung luas poligon convex hull menggunakan Rumus Shoelace (Gauss Area Formula).
-
-    Satuan luas bersifat generik (unit^2).
-    """
     n = len(polygon)
     if n < 3:
         return 0.0
@@ -41,11 +29,6 @@ def calculate_polygon_area(polygon):
 
 
 def base_case_hull(points):
-    """
-    Base case untuk himpunan titik berukuran <= 3.
-
-    Mengembalikan urutan titik pada hull dalam orientasi Counter-Clockwise (CCW).
-    """
     n = len(points)
     if n <= 1:
         return points
@@ -65,11 +48,6 @@ def base_case_hull(points):
 
 
 def merge_hulls(left_hull, right_hull):
-    """
-    Menggabungkan dua sub-hull (kiri dan kanan) yang masing-masing berurutan CCW
-
-    dengan mencari upper tangent dan lower tangent dalam waktu O(n).
-    """
     n1 = len(left_hull)
     n2 = len(right_hull)
 
@@ -157,7 +135,6 @@ def merge_hulls(left_hull, right_hull):
 
 
 def divide_and_conquer_hull(points):
-    """Fungsi utama rekursif Divide & Conquer untuk Convex Hull."""
     if len(points) <= 3:
         return base_case_hull(points)
 
@@ -175,7 +152,6 @@ def divide_and_conquer_hull(points):
 
 
 def compute_convex_hull(points):
-    """Wrapper untuk mengurutkan titik terlebih dahulu sebelum Divide & Conquer."""
     # Hapus duplikasi titik dan urutkan berdasarkan x (kemudian y jika x identik)
     unique_pts = sorted(list(set(points)), key=lambda p: (p[0], p[1]))
     if len(unique_pts) <= 2:
@@ -302,7 +278,6 @@ class ConvexHullGUI:
         self.canvas.bind('<Button-1>', self.on_canvas_click)
 
     def canvas_to_user_coord(self, px, py):
-        """Mengonversi titik piksel kanvas ke koordinat logika sesuai mode pusat koordinat."""
         if self.origin_mode.get() == 'center':
             ox = self.canvas_width / 2.0
             oy = self.canvas_height / 2.0
@@ -311,7 +286,6 @@ class ConvexHullGUI:
             return (px, py)  # Sudut kiri atas sebagai (0, 0)
 
     def user_to_canvas_coord(self, x, y):
-        """Mengonversi koordinat logika kembali ke posisi piksel kanvas."""
         if self.origin_mode.get() == 'center':
             ox = self.canvas_width / 2.0
             oy = self.canvas_height / 2.0
@@ -320,7 +294,6 @@ class ConvexHullGUI:
             return (x, y)
 
     def draw_canvas_axes(self):
-        """Menggambar grid atau sumbu kartesian jika mode pusat window dipilih."""
         self.canvas.delete('grid_lines')
         if self.origin_mode.get() == 'center':
             mid_x = self.canvas_width / 2.0
@@ -359,7 +332,6 @@ class ConvexHullGUI:
             self.run_convex_hull()
 
     def on_canvas_click(self, event):
-        """Menambahkan titik secara interaktif via klik mouse."""
         px, py = event.x, event.y
         self.canvas_points.append((px, py))
         self.draw_point(px, py)
@@ -370,7 +342,6 @@ class ConvexHullGUI:
         self.canvas.create_oval(px - r, py - r, px + r, py + r, fill=color, outline='#000000', tags='point')
 
     def generate_random_sites(self):
-        """Menghasilkan minimal 25 titik secara acak sesuai instruksi tugas."""
         self.clear_canvas()
         num_points = random.randint(25, 35)
         margin = 50
@@ -384,7 +355,6 @@ class ConvexHullGUI:
         self.lbl_points_count.config(text=f'Jumlah Titik: {len(self.canvas_points)}')
 
     def run_convex_hull(self):
-        """Menghitung dan memvisualisasikan Convex Hull dengan Divide & Conquer."""
         if len(self.canvas_points) < 3:
             self.lbl_hull_vertices.config(text='Titik Hull: < 3')
             self.lbl_area.config(text='Luas Hull: 0.00 unit²')
@@ -440,7 +410,6 @@ class ConvexHullGUI:
         self.lbl_area.config(text=f'Luas Hull: {area:,.2f} unit²')
 
     def clear_canvas(self):
-        """Membersihkan seluruh titik dan gambar convex hull."""
         self.canvas_points.clear()
         self.canvas.delete('point')
         self.canvas.delete('hull_poly')
