@@ -45,6 +45,14 @@ def merge_hulls(left_hull, right_hull):
     n1 = len(left_hull)
     n2 = len(right_hull)
 
+    # Dua hull kecil (<= 2 titik) bisa berada pada satu garis.
+    # Jika semua titik segaris, hasilnya cukup dua titik terluar.
+    if n1 <= 2 and n2 <= 2:
+        pts = sorted(left_hull + right_hull)
+        lo, hi = pts[0], pts[-1]
+        if all(cross_product(lo, hi, p) == 0 for p in pts):
+            return [lo, hi]
+
     # 1. Cari titik paling kanan di hull kiri
     left_start_idx = max(range(n1), key=lambda i: (left_hull[i][0], left_hull[i][1]))
     # 2. Cari titik paling kiri di hull kanan
@@ -125,7 +133,14 @@ def merge_hulls(left_hull, right_hull):
         curr = (curr + 1) % n2
         merged.append(right_hull[curr])
 
-    return merged
+    # Buang titik yang segaris dengan kedua tetangganya (bukan sudut hull)
+    m = len(merged)
+    if m < 3:
+        return merged
+    return [
+        merged[k] for k in range(m)
+        if cross_product(merged[k - 1], merged[k], merged[(k + 1) % m]) != 0
+    ]
 
 
 def divide_and_conquer_hull(points):
